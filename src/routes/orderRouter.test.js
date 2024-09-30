@@ -122,6 +122,7 @@ test('create order with bad request', async () => {
 
 test('add menu item unauth', async () => {
     const loginRes = await request(app).put('/api/auth').send(testUser);
+    const testUserAuthToken = loginRes.body.token;
     const addRes = await request(app).put('/api/order/menu').set('Authorization', `Bearer ${testUserAuthToken}`).send({ franchiseID: 1, storeId: 1, items: [{ title:"Bread", description: "No topping, no sauce, just carbs", image:"pizza9.png", price: 10 }]});
     expect(addRes.status).toBe(403);
 })
