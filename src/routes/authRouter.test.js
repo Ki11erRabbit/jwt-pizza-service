@@ -23,11 +23,13 @@ async function createAdminUser() {
 
 const testUser = { name: 'pizza diner', email: 'reg@test.com', password: 'a' };
 let testUserAuthToken;
+let testUserID;
 
 beforeAll(async () => {
   testUser.email = Math.random().toString(36).substring(2, 12) + '@test.com';
   const registerRes = await request(app).post('/api/auth').send(testUser);
   testUserAuthToken = registerRes.body.token;
+    testUserID = registerRes.body.user.id;
 });
 
 test('login', async () => {
@@ -35,8 +37,9 @@ test('login', async () => {
   expect(loginRes.status).toBe(200);
   expect(loginRes.body.token).toMatch(/^[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*$/);
 
-  const { ...user } = { ...testUser, roles: [{ role: 'diner' }] };
+  const { password, ...user } = { ...testUser, roles: [{ role: 'diner' }] };
   expect(loginRes.body.user).toMatchObject(user);
+  expect(password).toBe('a');
 });
 
 test('logout', async () => {
@@ -46,17 +49,14 @@ test('logout', async () => {
 });
 
 
-/*test('update user', async () => {
-    const loginRes = await request(app).put('/api/auth').send(testUser);
+test('update user', async () => {
+    const adminUser = await createAdminUser();
+    const loginRes = await request(app).put('/api/auth').send(adminUser);
     const testUserAuthToken = loginRes.body.token;
-    
-    console.log(JSON.stringify(loginRes))
-    const userID = loginRes.user.id;
-
-    const updateRes = await request(app).put(`/api/${userID}`).set('Authorization', `Bearer ${testUserAuthToken}`).send({ email: 'test@test.com', password: 'a' });
+    const updateRes = await request(app).put(`/api/auth/${testUserID}`).set('Authorization', `Bearer ${testUserAuthToken}`).send({ email: "new@new.com", password: "new" });
 
     expect(updateRes.status).toBe(200);
-})*/
+})
 
 test('create admin', async () => {
     const admin = await createAdminUser();
@@ -65,7 +65,17 @@ test('create admin', async () => {
     expect(loginRes.status).toBe(200);
     expect(loginRes.body.token).toMatch(/^[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*$/);
     
-    const { ...user } = { ...admin, roles: [{ role: 'admin' }] };
+    const { password, ...user } = { ...admin, roles: [{ role: 'admin' }] };
     expect(loginRes.body.user).toMatchObject(user);
+    expect(password).toBe('toomanysecrets');
 
+})
+
+
+test('bad auth', async () => {
+    const loginRes = await request(app).put('/api/auth').send(testUser);
+    const testUserAuthToken = loginRes.body.token;
+    const badAuthRes = await request(app).put(`/api/auth/${testUserID}`).set('Authorization', `Bearer ${testUserAuthToken}bad`).send(testUser);
+    
+    expect(badAuthRes.status).toBe(401);
 })

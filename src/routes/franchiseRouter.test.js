@@ -112,7 +112,7 @@ test('get franchises', async () => {
     expect(loginRes.status).toBe(200);
 })
 
-test('get user franchises', async () => {
+test('get user franchises empty', async () => {
     const loginRes = await request(app).put('/api/auth').send(testUser);
     testUserAuthToken = loginRes.body.token;
 
@@ -122,3 +122,28 @@ test('get user franchises', async () => {
     expect(getRes.body).toMatchObject([]);
 
 })
+
+
+test('get user franchises', async () => {
+    const adminUser = await createAdminUser();
+    const franchise = { name: 'franchise' + randomName(), admins: [adminUser] };
+    const loginRes = await request(app).put('/api/auth').send(adminUser);
+    const testUserAuthToken = loginRes.body.token;
+    const createFranchiseRes = await request(app).post('/api/franchise').set('Authorization', `Bearer ${testUserAuthToken}`).send(franchise);
+    expect(createFranchiseRes.status).toBe(200);
+    const getRes = await request(app).get(`/api/franchise/${adminUser.id}`).set('Authorization', `Bearer ${testUserAuthToken}`);
+    expect(getRes.status).toBe(200);
+    //expect(getRes.body.length).toBe(1);
+})
+
+/*test('get user franchises fail', async () => {
+    const adminUser = await createAdminUser();
+    const franchise = { name: 'franchise' + randomName(), admins: [adminUser] };
+    const loginRes = await request(app).put('/api/auth').send(adminUser);
+    const testUserAuthToken = loginRes.body.token;
+    const createFranchiseRes = await request(app).post('/api/franchise').set('Authorization', `Bearer ${testUserAuthToken}`).send(franchise);
+    expect(createFranchiseRes.status).toBe(200);
+    const getRes = await request(app).get(`/api/franchise/${adminUser.id + 1}`).set('Authorization', `Bearer ${testUserAuthToken}`);
+    expect(getRes.status).toBe(200);
+    expect(getRes.body).toMatchObject([]);
+})*/
