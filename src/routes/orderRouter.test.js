@@ -99,7 +99,7 @@ test('create order with bad request', async () => {
     const adminUser = await createAdminUser();
     const franchise = { name: 'franchise with store' + randomName(), admins: [adminUser] };
     const loginRes = await request(app).put('/api/auth').send(adminUser);
-    const testUserAuthToken = loginRes.body.token;
+    testUserAuthToken = loginRes.body.token;
     const createFranchiseRes = await request(app).post('/api/franchise').set('Authorization', `Bearer ${testUserAuthToken}`).send(franchise);
 
     const franchiseId = createFranchiseRes.body.id;
