@@ -1,4 +1,3 @@
-const orderRouter = require('./orderRouter.js');
 
 const request = require('supertest');
 const app = require('../service');
@@ -53,10 +52,19 @@ test('get orders for user', async () => {
 
 test('create order for user', async () => {
     const loginRes = await request(app).put('/api/auth').send(testUser);
-    const testUserAuthToken = loginRes.body.token;
+    testUserAuthToken = loginRes.body.token;
     expect(loginRes.status).toBe(200);
     const createRes = await request(app).post('/api/order').set('Authorization', `Bearer ${testUserAuthToken}`).send({ franchiseId: 1, storeId:1, items:[{ menuId: 1, description: "Bread", price: 10 }] });
     expect(createRes.status).toBe(200);
+})
+
+
+test('create order for user fail', async () => {
+    const loginRes = await request(app).put('/api/auth').send(testUser);
+    testUserAuthToken = loginRes.body.token;
+    expect(loginRes.status).toBe(200);
+    const createRes = await request(app).post('/api/order').set('Authorization', `Bearer ${testUserAuthToken}`).send({ franchiseId: 1, items:[{ menuId: 1, description: "Bread", price: 10 }] });
+    expect(createRes.status).toBe(500);
 })
 
 
@@ -64,5 +72,5 @@ test('add menu item fail', async () => {
     const loginRes = await request(app).put('/api/auth').send(testUser);
     const testUserAuthToken = loginRes.body.token;
     const addRes = await request(app).post('/api/order').set('Authorization', `Bearer ${testUserAuthToken}`).send({ franchiseID: 1, storeId: 1, items: [{ title:"Bread", description: "No topping, no sauce, just carbs", image:"pizza9.png", price: 10 }]});
-    expect(addRes.status).toBe(200);
+    expect(addRes.status).toBe(401);
 })

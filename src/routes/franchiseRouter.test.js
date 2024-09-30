@@ -1,5 +1,4 @@
 const request = require('supertest');
-const franchiseRouter = require('./franchiseRouter');
 const app = require('../service');
 
 
@@ -23,11 +22,14 @@ async function createAdminUser() {
 
 
 const testUser = { name: 'pizza diner', email: 'reg@test.com', password: 'a' };
+let testUserAuthToken;
+let testUserID;
 
 beforeAll(async () => {
   testUser.email = Math.random().toString(36).substring(2, 12) + '@test.com';
   const registerRes = await request(app).post('/api/auth').send(testUser);
   testUserAuthToken = registerRes.body.token;
+    testUserID = registerRes.body.user.id;
 });
 
 
@@ -35,7 +37,7 @@ test('create franchise', async () => {
     const adminUser = await createAdminUser();
     const franchise = { name: 'franchise' + randomName(), admins: [adminUser] };
     const loginRes = await request(app).put('/api/auth').send(adminUser);
-    const testUserAuthToken = loginRes.body.token;
+    testUserAuthToken = loginRes.body.token;
     const createFranchiseRes = await request(app).post('/api/franchise').set('Authorization', `Bearer ${testUserAuthToken}`).send(franchise);
 
     expect(createFranchiseRes.status).toBe(200);
@@ -108,4 +110,15 @@ test('get franchises', async () => {
     const loginRes = await request(app).get('/api/franchise');
 
     expect(loginRes.status).toBe(200);
+})
+
+test('get user franchises', async () => {
+    const loginRes = await request(app).put('/api/auth').send(testUser);
+    testUserAuthToken = loginRes.body.token;
+
+    const getRes = await request(app).get(`/api/franchise/${testUserID}`).set('Authorization', `Bearer ${testUserAuthToken}`);
+
+    expect(getRes.status).toBe(200);
+    expect(getRes.body).toMatchObject([]);
+
 })

@@ -35,7 +35,7 @@ test('login', async () => {
   expect(loginRes.status).toBe(200);
   expect(loginRes.body.token).toMatch(/^[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*$/);
 
-  const { password, ...user } = { ...testUser, roles: [{ role: 'diner' }] };
+  const { ...user } = { ...testUser, roles: [{ role: 'diner' }] };
   expect(loginRes.body.user).toMatchObject(user);
 });
 
@@ -65,7 +65,7 @@ test('create admin', async () => {
     expect(loginRes.status).toBe(200);
     expect(loginRes.body.token).toMatch(/^[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*$/);
     
-    const { password, ...user } = { ...admin, roles: [{ role: 'admin' }] };
+    const { ...user } = { ...admin, roles: [{ role: 'admin' }] };
     expect(loginRes.body.user).toMatchObject(user);
 
 })
