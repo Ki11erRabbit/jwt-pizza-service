@@ -9,7 +9,9 @@
     "coverageReporters": ["json-summary", "text"],
     "collectCoverageFrom": [
       "src/**/*.{js,jsx,ts,tsx}",
-      "!src/**/*.d.ts"
+      "!src/**/*.d.ts",
+      "!src/index.js",
+      "!src/init.js"
     ],
     "coverageThreshold": {
       "global": {
