@@ -50,6 +50,11 @@ jobs:
 
       - name: Lint
         run: npm run lint
+      - uses: sibiraj-s/action-eslint@v3
+        with:
+          eslint-args: '--ignore-path=.gitignore --quiet'
+          extensions: 'js,jsx,ts,tsx'
+          annotations: true
 
       - name: Write config file
         run: |
