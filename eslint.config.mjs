@@ -7,5 +7,6 @@ export default [
   {languageOptions: { globals: globals.node }},
   {languageOptions: { globals: globals.jest }},
   pluginJs.configs.recommended,
-  { ignores: ["config.js"] }
+  { ignores: ["config.js"] },
+  { ignores: ["*.test.js"] }
 ];
