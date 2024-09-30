@@ -5,11 +5,12 @@
       "node_modules",
       "src"
     ],
+    "collectCoverage": true,
+    "coverageReporters": ["json-summary", "text"],
     "collectCoverageFrom": [
       "src/**/*.{js,jsx,ts,tsx}",
       "!src/**/*.d.ts"
     ],
-    "collectCoverage": true,
     "coverageThreshold": {
       "global": {
         "branches": 80,
