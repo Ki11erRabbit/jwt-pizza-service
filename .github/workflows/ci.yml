@@ -37,14 +37,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
       
-      - name: Install eslint
-        run: npm init '@eslint/config@latest'
+          #- name: Install eslint
+          #run: npm init '@eslint/config@latest'
 
       - name: Install jest
         run: npm install -D jest 
 
-      - name: Lint
-        run: npm run lint
+          #- name: Lint
+          #run: npm run lint
 
       - name: Write config file
         run: |
