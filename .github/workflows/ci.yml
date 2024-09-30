@@ -33,17 +33,17 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20.x"
+      - uses: sibiraj-s/action-eslint@v3
+        with:
+          eslint-args: '--ignore-path=.gitignore --quiet'
+          extensions: 'js,jsx,ts,tsx'
+          annotations: true
 
       - name: Install dependencies
         run: npm ci
       
       - name: Install eslint
         run: npm ci
-      - uses: sibiraj-s/action-eslint@v3
-        with:
-          eslint-args: '--ignore-path=.gitignore --quiet'
-          extensions: 'js,jsx,ts,tsx'
-          annotations: true
 
       - name: Install jest
         run: npm install -D jest 
