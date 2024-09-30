@@ -37,14 +37,19 @@ jobs:
       - name: Install dependencies
         run: npm ci
       
-          #- name: Install eslint
-          #run: npm init '@eslint/config@latest'
+      - name: Install eslint
+        run: npm ci
+      - uses: sibiraj-s/action-eslint@v3
+        with:
+          eslint-args: '--ignore-path=.gitignore --quiet'
+          extensions: 'js,jsx,ts,tsx'
+          annotations: true
 
       - name: Install jest
         run: npm install -D jest 
 
-          #- name: Lint
-          #run: npm run lint
+      - name: Lint
+        run: npm run lint
 
       - name: Write config file
         run: |
@@ -86,16 +91,3 @@ jobs:
           git add .
           git commit -m "generated"
           git push
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - run: npm ci # or yarn install
-      - uses: sibiraj-s/action-eslint@v3
-        with:
-          eslint-args: '--ignore-path=.gitignore --quiet'
-          extensions: 'js,jsx,ts,tsx'
-          annotations: true
