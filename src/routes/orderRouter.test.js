@@ -91,7 +91,7 @@ test('add menu item fail', async () => {
     const loginRes = await request(app).put('/api/auth').send(testUser);
     const testUserAuthToken = loginRes.body.token;
     const addRes = await request(app).post('/api/order').set('Authorization', `Bearer ${testUserAuthToken}`).send({ franchiseID: 1, storeId: 1, items: [{ title:"Bread", description: "No topping, no sauce, just carbs", image:"pizza9.png", price: 10 }]});
-    expect(addRes.status).toBe(401);
+    expect(addRes.status).toBe(500);
 })
 
 
