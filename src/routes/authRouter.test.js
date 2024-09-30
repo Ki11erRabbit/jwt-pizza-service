@@ -79,3 +79,9 @@ test('bad auth', async () => {
     
     expect(badAuthRes.status).toBe(401);
 })
+
+test('regiser but missing info', async () => {
+    const registerRes = await request(app).post('/api/auth').send({ name: 'pizza diner', email: '', password: 'a' });
+    expect(registerRes.status).toBe(400);
+
+})

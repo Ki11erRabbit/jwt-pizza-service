@@ -202,3 +202,28 @@ test('create franchise store not admin', async () => {
     expect(createStoreRes.body.message).toBe('unable to create a store');
     expect(createStoreRes.status).toBe(403);
 })
+
+
+test('delete franchise store not admin', async () => {
+    const loginRes = await request(app).put('/api/auth').send(testUser);
+    const userAuthToken = loginRes.body.token;
+    
+    const adminUser = await createAdminUser();
+    const adminLoginRes = await request(app).put('/api/auth').send(adminUser);
+    const adminTestUserAuthToken = adminLoginRes.body.token;
+    console.log('adminTestUserAuthToken', adminTestUserAuthToken);
+    const franchise = { name: 'franchise' + randomName(), admins: [adminUser] };
+    const createFranchiseRes = await request(app).post('/api/franchise').set('Authorization', `Bearer ${adminTestUserAuthToken}`).send(franchise);
+
+    expect(createFranchiseRes.status).toBe(200);
+    const franchiseId = createFranchiseRes.body.id;
+
+    const createStoreRes = await request(app).post(`/api/franchise/${franchiseId}/store`).set('Authorization', `Bearer ${adminTestUserAuthToken}`).send({ name: 'store' });
+    
+    const storeId = createStoreRes.body.id;
+
+    const deleteRes = await request(app).delete(`/api/franchise/${franchiseId}/store/${storeId}`).set('Authorization', `Bearer ${userAuthToken}`).send({ name: 'store' });
+
+    expect(deleteRes.body.message).toBe('unable to delete a store');
+    expect(deleteRes.status).toBe(403);
+})
