@@ -33,11 +33,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20.x"
-      - uses: sibiraj-s/action-eslint@v3
-        with:
-          eslint-args: '--ignore-path=.gitignore --quiet'
-          extensions: 'js,jsx,ts,tsx'
-          annotations: true
 
       - name: Install dependencies
         run: npm ci
@@ -50,11 +45,6 @@ jobs:
 
       - name: Lint
         run: npm run lint
-      - uses: sibiraj-s/action-eslint@v3
-        with:
-          eslint-args: '--ignore-path=.gitignore --quiet'
-          extensions: 'js,jsx,ts,tsx'
-          annotations: true
 
       - name: Write config file
         run: |
