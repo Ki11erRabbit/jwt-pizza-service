@@ -152,3 +152,7 @@ jobs:
           service: jwt-pizza-service
           cluster: jwt-pizza-service
           wait-for-service-stability: false 
+      - name: Push CloudFormation to AWS S3
+        run: |
+          echo Pushing Cloud Formation json file
+          aws s3 cp cloudFormation s3://${{ secrets.APP_BUCKET }}
