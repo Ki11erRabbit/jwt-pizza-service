@@ -136,7 +136,7 @@ authRouter.put(
     const userId = Number(req.params.userId);
     const user = req.user;
     if (user.id !== userId && !user.isRole(Role.Admin)) {
-        serviceEndTime = performance.now();
+        const serviceEndTime = performance.now();
         metrics.addServiceLatency(serviceEndTime - serviceStartTime)
       return res.status(403).json({ message: 'unauthorized' });
     }
