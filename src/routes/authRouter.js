@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const config = require('../config.js');
 const { asyncHandler } = require('../endpointHelper.js');
 const { DB, Role } = require('../database/database.js');
+const metrics = require('../metrics.js');
 
 const authRouter = express.Router();
 
@@ -67,6 +68,7 @@ authRouter.authenticateToken = (req, res, next) => {
 authRouter.post(
   '/',
   asyncHandler(async (req, res) => {
+    const serviceStartTime = performance.now();
     const { name, email, password } = req.body;
     if (!name || !email || !password) {
       return res.status(400).json({ message: 'name, email, and password are required' });
@@ -74,46 +76,95 @@ authRouter.post(
     const user = await DB.addUser({ name, email, password, roles: [{ role: Role.Diner }] });
     const auth = await setAuth(user);
     res.json({ user: user, token: auth });
+    if (user) {
+        metrics.incrementSuccessfulLogins();
+        metrics.incrementActiveUsers();
+    }
+    const serviceEndTime = performance.now();
+    metrics.addServiceLatency(serviceEndTime - serviceStartTime);
+    next();
   })
 );
+
+authRouter.post('/', asyncHandler(async (req, res) => {
+    metrics.incrementPostRequests();
+    next();
+}))
+
 
 // login
 authRouter.put(
   '/',
   asyncHandler(async (req, res) => {
+    const serviceStartTime = performance.now();
     const { email, password } = req.body;
     const user = await DB.getUser(email, password);
     const auth = await setAuth(user);
     res.json({ user: user, token: auth });
+    if (user) {
+        metrics.incrementSuccessfulLogins();
+        metrics.incrementActiveUsers();
+    }
+    const serviceEndTime = performance.now();
+    metrics.addServiceLatency(serviceEndTime - serviceStartTime
+    next();
   })
 );
+
+authRouter.put('/', asyncHandler(async (req, res) => {
+    metrics.incrementPutRequests();
+    next();
+}))
+
+
 
 // logout
 authRouter.delete(
   '/',
   authRouter.authenticateToken,
   asyncHandler(async (req, res) => {
+    const serviceStartTime = performance.now();
     await clearAuth(req);
     res.json({ message: 'logout successful' });
+    metrics.decrementActiveUsers();
+    const serviceEndTime = performance.now();
+    metrics.addServiceLatency(serviceEndTime - serviceStartTime);
+      next();
   })
 );
+
+authRouter.delete('/', asyncHandler(async (req, res) => {
+    metrics.incrementDeleteRequests();
+    next();
+}))
 
 // updateUser
 authRouter.put(
   '/:userId',
   authRouter.authenticateToken,
   asyncHandler(async (req, res) => {
+    const serviceStartTime = performance.now();
     const { email, password } = req.body;
     const userId = Number(req.params.userId);
     const user = req.user;
     if (user.id !== userId && !user.isRole(Role.Admin)) {
+        serviceEndTime = performance.now();
+        metrics.addServiceLatency(serviceEndTime - serviceStartTime
       return res.status(403).json({ message: 'unauthorized' });
     }
 
     const updatedUser = await DB.updateUser(userId, email, password);
     res.json(updatedUser);
+    const serviceEndTime = performance.now();
+    metrics.addServiceLatency(serviceEndTime - serviceStartTime
+    next();
   })
 );
+
+authRouter.put('/:userId', asyncHandler(async (req, res) => {
+    metrics.incrementPutRequests();
+    next();
+}))
 
 async function setAuth(user) {
   const token = jwt.sign(user, config.jwtSecret);
