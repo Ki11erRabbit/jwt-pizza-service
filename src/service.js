@@ -32,6 +32,7 @@ apiRouter.use('/docs', (req, res) => {
 });
 
 app.get('/', (req, res) => {
+    metrics.incrementGetRequests();
   res.json({
     message: 'welcome to JWT Pizza',
     version: version.version,
@@ -39,6 +40,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/metrics', (req, res) => {
+    metrics.incrementGetRequests();
       const response = {
         string: metrics.getLastMetric()
       };
