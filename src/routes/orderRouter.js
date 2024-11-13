@@ -45,13 +45,13 @@ orderRouter.endpoints = [
 // getMenu
 orderRouter.get(
   '/menu',
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req, res, next) => {
     res.send(await DB.getMenu());
     next();
   })
 );
 
-orderRouter.get('/menu', asyncHandler(async (req, res) => {
+orderRouter.get('/menu', asyncHandler(async (_, _, next) => {
     metrics.incrementGetRequests();
     next();
 }))
@@ -60,7 +60,7 @@ orderRouter.get('/menu', asyncHandler(async (req, res) => {
 orderRouter.put(
   '/menu',
   authRouter.authenticateToken,
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req, res, next) => {
     if (!req.user.isRole(Role.Admin)) {
       throw new StatusCodeError('unable to add menu item', 403);
     }
@@ -68,10 +68,11 @@ orderRouter.put(
     const addMenuItemReq = req.body;
     await DB.addMenuItem(addMenuItemReq);
     res.send(await DB.getMenu());
+      next();
   })
 );
 
-orderRouter.put('/menu', asyncHandler(async (req, res) => {
+orderRouter.put('/menu', asyncHandler(async (_, _, next) => {
     metrics.incrementPostRequests();
     next();
 }))
@@ -80,13 +81,13 @@ orderRouter.put('/menu', asyncHandler(async (req, res) => {
 orderRouter.get(
   '/',
   authRouter.authenticateToken,
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req, res, next) => {
     res.json(await DB.getOrders(req.user, req.query.page));
     next();
   })
 );
 
-orderRouter.get('/', asyncHandler(async (req, res) => {
+orderRouter.get('/', asyncHandler(async (_, _, next) => {
     metrics.incrementGetRequests();
     next();
 }))
@@ -95,7 +96,7 @@ orderRouter.get('/', asyncHandler(async (req, res) => {
 orderRouter.post(
   '/',
   authRouter.authenticateToken,
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req, res, next) => {
     const requestStartTime = performance.now();
     const orderReq = req.body;
     const order = await DB.addDinerOrder(req.user, orderReq);
@@ -121,7 +122,7 @@ orderRouter.post(
   })
 );
 
-orderRouter.post('/', asyncHandler(async (req, res) => {
+orderRouter.post('/', asyncHandler(async (_, _, next) => {
     metrics.incrementPostRequests();
     next();
 }))

@@ -32,6 +32,17 @@ beforeAll(async () => {
     testUserID = registerRes.body.user.id;
 });
 
+test('add admin', async () => {
+  let user = { password: 'admin', roles: [{ role: Role.Admin }] };
+  user.name = "常用名字";
+  user.email = 'a@jwt.com';
+
+  await DB.addUser(user);
+
+  user.password = 'admin';
+  expect(true).toBe(true);
+});
+
 test('login', async () => {
   const loginRes = await request(app).put('/api/auth').send(testUser);
   expect(loginRes.status).toBe(200);

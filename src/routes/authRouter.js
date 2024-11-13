@@ -67,7 +67,7 @@ authRouter.authenticateToken = (req, res, next) => {
 // register
 authRouter.post(
   '/',
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req, res, next) => {
     const serviceStartTime = performance.now();
     const { name, email, password } = req.body;
     if (!name || !email || !password) {
@@ -86,7 +86,7 @@ authRouter.post(
   })
 );
 
-authRouter.post('/', asyncHandler(async (req, res) => {
+authRouter.post('/', asyncHandler(async (_, _, next) => {
     metrics.incrementPostRequests();
     next();
 }))
@@ -95,7 +95,7 @@ authRouter.post('/', asyncHandler(async (req, res) => {
 // login
 authRouter.put(
   '/',
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req, res, next) => {
     const serviceStartTime = performance.now();
     const { email, password } = req.body;
     const user = await DB.getUser(email, password);
@@ -111,7 +111,7 @@ authRouter.put(
   })
 );
 
-authRouter.put('/', asyncHandler(async (req, res) => {
+authRouter.put('/', asyncHandler(async (_, _, next) => {
     metrics.incrementPutRequests();
     next();
 }))
@@ -122,7 +122,7 @@ authRouter.put('/', asyncHandler(async (req, res) => {
 authRouter.delete(
   '/',
   authRouter.authenticateToken,
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req, res, next) => {
     const serviceStartTime = performance.now();
     await clearAuth(req);
     res.json({ message: 'logout successful' });
@@ -133,7 +133,7 @@ authRouter.delete(
   })
 );
 
-authRouter.delete('/', asyncHandler(async (req, res) => {
+authRouter.delete('/', asyncHandler(async (_, _, next) => {
     metrics.incrementDeleteRequests();
     next();
 }))
@@ -142,7 +142,7 @@ authRouter.delete('/', asyncHandler(async (req, res) => {
 authRouter.put(
   '/:userId',
   authRouter.authenticateToken,
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req, res, next) => {
     const serviceStartTime = performance.now();
     const { email, password } = req.body;
     const userId = Number(req.params.userId);
@@ -161,7 +161,7 @@ authRouter.put(
   })
 );
 
-authRouter.put('/:userId', asyncHandler(async (req, res) => {
+authRouter.put('/:userId', asyncHandler(async (_, _, next) => {
     metrics.incrementPutRequests();
     next();
 }))
