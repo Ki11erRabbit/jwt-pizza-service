@@ -103,7 +103,7 @@ authRouter.put(
         metrics.incrementActiveUsers();
     }
     const serviceEndTime = performance.now();
-    metrics.addServiceLatency(serviceEndTime - serviceStartTime
+    metrics.addServiceLatency(serviceEndTime - serviceStartTime)
     next();
   })
 );
