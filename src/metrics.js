@@ -48,6 +48,7 @@ class Metrics {
         this.sendMetricToGrafana('request', 'post', 'post', this.postRequests);
         this.sendMetricToGrafana('request', 'delete', 'delete', this.deleteRequests);
         this.sendMetricToGrafana('request', 'get', 'get', this.getRequests);
+        this.sendMetricToGrafana('request', 'put', 'put', this.getRequests);
 
         this.sendMetricToGrafana('user', 'active', 'count', this.activeUserCount);
         this.sendMetricToGrafana('login', 'success', 'success', this.successfulLogins);

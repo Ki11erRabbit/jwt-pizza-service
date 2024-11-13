@@ -101,6 +101,8 @@ authRouter.put(
     if (user) {
         metrics.incrementSuccessfulLogins();
         metrics.incrementActiveUsers();
+    } else {
+        metrics.incrementFailedLogins();
     }
     const serviceEndTime = performance.now();
     metrics.addServiceLatency(serviceEndTime - serviceStartTime)
