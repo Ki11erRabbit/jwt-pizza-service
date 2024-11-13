@@ -31,8 +31,8 @@ class Metrics {
         this.pizzasSold = 0;
         this.pizzaCreationFailures = 0;
         this.pizzaRevenue = 0;
-        this.serviceLatency = [];
-        this.PizzaFactoryLatency = [];
+        this.serviceLatency = 0;
+        this.PizzaFactoryLatency = 0;
 
 
     // This will periodically sent metrics to Grafana
@@ -55,23 +55,10 @@ class Metrics {
         this.sendMetricToGrafana('pizza', 'creation', 'failure', this.pizzaCreationFailures);
         this.sendMetricToGrafana('pizza', 'revenue', 'revenue', this.pizzaRevenue);
         
-        let serviceLatencySum = 0;
-        for (const latency of this.serviceLatency) {
-            serviceLatencySum += latency;
-        }
-        const serviceLatencyAvg = serviceLatencySum / this.serviceLatency.length;
 
-        this.sendMetricToGrafana('service', 'latency', 'ms', isNaN(serviceLatencyAvg) ? 0 : serviceLatencyAvg);
-        
-        let PizzaFactoryLatencySum = 0;
-        for (const latency of this.PizzaFactoryLatency) {
-            PizzaFactoryLatencySum += latency;
-        }
-        const PizzaFactoryLatencyAvg = PizzaFactoryLatencySum / this.PizzaFactoryLatency.length;
+        this.sendMetricToGrafana('service', 'latency', 'ms', this.serviceLatency);
+        this.sendMetricToGrafana('PizzaFactory', 'latency', 'ms', this.PizzaFactoryLatency);
 
-        this.sendMetricToGrafana('PizzaFactory', 'latency', 'ms', isNaN(PizzaFactoryLatencyAvg) ? 0 : PizzaFactoryLatencyAvg);
-
-        this.resetMetrics();
 
 
 
@@ -88,8 +75,8 @@ class Metrics {
         this.pizzasSold = 0;
         this.pizzaCreationFailures = 0;
         this.pizzaRevenue = 0;
-        this.serviceLatency = [];
-        this.PizzaFactoryLatency = [];
+        this.serviceLatency = 0;
+        this.PizzaFactoryLatency = 0;
     }
 
     incrementRequests() {
@@ -134,10 +121,10 @@ class Metrics {
         this.pizzaRevenue += amount;
     }
     addServiceLatency(amount) {
-        this.serviceLatency + [amount];
+        this.serviceLatency = amount;
     }
     addPizzaFactoryLatency(amount) {
-        this.PizzaFactoryLatency += amount;
+        this.PizzaFactoryLatency = amount;
     }
 
     sendMetricToGrafana(metricPrefix, httpMethod, metricName, metricValue) {
