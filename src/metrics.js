@@ -31,8 +31,8 @@ class Metrics {
         this.pizzasSold = 0;
         this.pizzaCreationFailures = 0;
         this.pizzaRevenue = 0;
-        this.serviceLatency = 0;
-        this.PizzaFactoryLatency = 0;
+        this.serviceLatency = [];
+        this.PizzaFactoryLatency = [];
 
 
     // This will periodically sent metrics to Grafana
@@ -61,7 +61,7 @@ class Metrics {
         }
         const serviceLatencyAvg = serviceLatencySum / this.serviceLatency.length;
 
-        this.sendMetricToGrafana('service', 'latency', 'ms', serviceLatencyAvg);
+        this.sendMetricToGrafana('service', 'latency', 'ms', isNaN(serviceLatencyAvg) ? 0 : serviceLatencyAvg);
         
         let PizzaFactoryLatencySum = 0;
         for (const latency of this.PizzaFactoryLatency) {
@@ -69,13 +69,13 @@ class Metrics {
         }
         const PizzaFactoryLatencyAvg = PizzaFactoryLatencySum / this.PizzaFactoryLatency.length;
 
-        this.sendMetricToGrafana('PizzaFactory', 'latency', 'ms', PizzaFactoryLatencyAvg);
+        this.sendMetricToGrafana('PizzaFactory', 'latency', 'ms', isNaN(PizzaFactoryLatencyAvg) ? 0 : PizzaFactoryLatencyAvg);
 
         this.resetMetrics();
 
 
 
-    }, 60000);
+    }, 10000);
         timer.unref();
     }
 
@@ -141,16 +141,17 @@ class Metrics {
     }
 
     sendMetricToGrafana(metricPrefix, httpMethod, metricName, metricValue) {
-        const metric = `${metricPrefix},source=${config.source},method=${httpMethod} ${metricName}=${metricValue}`;
+        const metric = `${metricPrefix},source=${config.metrics.source},method=${httpMethod} ${metricName}=${metricValue}`;
+        console.log(`Pushing metric to Grafana: ${metric}`);
 
-        fetch(`${config.url}`, {
+        fetch(`${config.metrics.url}`, {
             method: 'post',
             body: metric,
-            headers: { Authorization: `Bearer ${config.userId}:${config.apiKey}` },
+            headers: { Authorization: `Bearer ${config.metrics.userId}:${config.metrics.apiKey}` },
         })
         .then((response) => {
             if (!response.ok) {
-              console.error('Failed to push metrics data to Grafana');
+              console.error(`Failed to push metrics data to Grafana ${metric}`);
             } else {
               console.log(`Pushed ${metric}`);
             }
