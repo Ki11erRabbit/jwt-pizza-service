@@ -33,10 +33,12 @@ class Metrics {
         this.pizzaRevenue = 0;
         this.serviceLatency = 0;
         this.PizzaFactoryLatency = 0;
+        this.lastMetric = "";
 
 
     // This will periodically sent metrics to Grafana
     const timer = setInterval(() => {
+        this.lastMetric = "";
         this.memoryUsage = getMemoryUsagePercentage();
         this.cpuUsage = getCpuUsagePercentage();
         this.sendMetricToGrafana('cpu', 'usage', 'percentage', this.cpuUsage);
@@ -126,9 +128,19 @@ class Metrics {
     addPizzaFactoryLatency(amount) {
         this.PizzaFactoryLatency = amount;
     }
+    
+    getLastMetric() {
+        return this.lastMetric;
+    }
+    
+    generateMetric(metricPrefix, httpMethod, metricName, metricValue) {
+        const metric = `${metricPrefix},source=${config.metrics.source},method=${httpMethod} ${metricName}=${metricValue}`;
+        this.lastMetric += metric + '\n';
+        return metric;
+    }
 
     sendMetricToGrafana(metricPrefix, httpMethod, metricName, metricValue) {
-        const metric = `${metricPrefix},source=${config.metrics.source},method=${httpMethod} ${metricName}=${metricValue}`;
+        const metric = this.generateMetric(metricPrefix, httpMethod, metricName, metricValue);
         console.log(`Pushing metric to Grafana: ${metric}`);
 
         fetch(`${config.metrics.url}`, {

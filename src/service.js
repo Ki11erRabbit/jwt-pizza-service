@@ -4,6 +4,7 @@ const orderRouter = require('./routes/orderRouter.js');
 const franchiseRouter = require('./routes/franchiseRouter.js');
 const version = require('./version.json');
 const config = require('./config.js');
+const metrics = require('./metrics.js');
 
 const app = express();
 app.use(express.json());
@@ -35,6 +36,13 @@ app.get('/', (req, res) => {
     message: 'welcome to JWT Pizza',
     version: version.version,
   });
+});
+
+app.get('/metrics', (req, res) => {
+      const response = {
+        string: metrics.getLastMetric()
+      };
+    res.json(response);
 });
 
 app.use('*', (req, res) => {
