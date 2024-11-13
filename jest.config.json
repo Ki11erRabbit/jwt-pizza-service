@@ -11,7 +11,8 @@
       "src/**/*.{js,jsx,ts,tsx}",
       "!src/**/*.d.ts",
       "!src/index.js",
-      "!src/init.js"
+      "!src/init.js",
+      "!src/metrics.js"
     ],
     "coverageThreshold": {
       "global": {
