@@ -68,6 +68,7 @@ authRouter.authenticateToken = (req, res, next) => {
 authRouter.post(
   '/',
   asyncHandler(async (req, res, next) => {
+    metrics.incrementPostRequests();
     const serviceStartTime = performance.now();
     const { name, email, password } = req.body;
     if (!name || !email || !password) {
@@ -86,16 +87,12 @@ authRouter.post(
   })
 );
 
-authRouter.post('/', asyncHandler(async (_, _, next) => {
-    metrics.incrementPostRequests();
-    next();
-}))
-
 
 // login
 authRouter.put(
   '/',
   asyncHandler(async (req, res, next) => {
+    metrics.incrementPutRequests();
     const serviceStartTime = performance.now();
     const { email, password } = req.body;
     const user = await DB.getUser(email, password);
@@ -111,18 +108,13 @@ authRouter.put(
   })
 );
 
-authRouter.put('/', asyncHandler(async (_, _, next) => {
-    metrics.incrementPutRequests();
-    next();
-}))
-
-
 
 // logout
 authRouter.delete(
   '/',
   authRouter.authenticateToken,
   asyncHandler(async (req, res, next) => {
+    metrics.incrementDeleteRequests();
     const serviceStartTime = performance.now();
     await clearAuth(req);
     res.json({ message: 'logout successful' });
@@ -133,16 +125,12 @@ authRouter.delete(
   })
 );
 
-authRouter.delete('/', asyncHandler(async (_, _, next) => {
-    metrics.incrementDeleteRequests();
-    next();
-}))
-
 // updateUser
 authRouter.put(
   '/:userId',
   authRouter.authenticateToken,
   asyncHandler(async (req, res, next) => {
+    metrics.incrementPutRequests();
     const serviceStartTime = performance.now();
     const { email, password } = req.body;
     const userId = Number(req.params.userId);
@@ -160,11 +148,6 @@ authRouter.put(
     next();
   })
 );
-
-authRouter.put('/:userId', asyncHandler(async (_, _, next) => {
-    metrics.incrementPutRequests();
-    next();
-}))
 
 async function setAuth(user) {
   const token = jwt.sign(user, config.jwtSecret);

@@ -46,21 +46,19 @@ orderRouter.endpoints = [
 orderRouter.get(
   '/menu',
   asyncHandler(async (req, res, next) => {
+    metrics.incrementGetRequests();
     res.send(await DB.getMenu());
     next();
   })
 );
 
-orderRouter.get('/menu', asyncHandler(async (_, _, next) => {
-    metrics.incrementGetRequests();
-    next();
-}))
 
 // addMenuItem
 orderRouter.put(
   '/menu',
   authRouter.authenticateToken,
   asyncHandler(async (req, res, next) => {
+    metrics.incrementPostRequests();
     if (!req.user.isRole(Role.Admin)) {
       throw new StatusCodeError('unable to add menu item', 403);
     }
@@ -72,31 +70,23 @@ orderRouter.put(
   })
 );
 
-orderRouter.put('/menu', asyncHandler(async (_, _, next) => {
-    metrics.incrementPostRequests();
-    next();
-}))
-
 // getOrders
 orderRouter.get(
   '/',
   authRouter.authenticateToken,
   asyncHandler(async (req, res, next) => {
+    metrics.incrementGetRequests();
     res.json(await DB.getOrders(req.user, req.query.page));
     next();
   })
 );
-
-orderRouter.get('/', asyncHandler(async (_, _, next) => {
-    metrics.incrementGetRequests();
-    next();
-}))
 
 // createOrder
 orderRouter.post(
   '/',
   authRouter.authenticateToken,
   asyncHandler(async (req, res, next) => {
+    metrics.incrementPostRequests();
     const requestStartTime = performance.now();
     const orderReq = req.body;
     const order = await DB.addDinerOrder(req.user, orderReq);
@@ -121,12 +111,6 @@ orderRouter.post(
     next();
   })
 );
-
-orderRouter.post('/', asyncHandler(async (_, _, next) => {
-    metrics.incrementPostRequests();
-    next();
-}))
-)
 
 
 module.exports = orderRouter;
