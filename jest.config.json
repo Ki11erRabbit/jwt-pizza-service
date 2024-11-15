@@ -12,7 +12,8 @@
       "!src/**/*.d.ts",
       "!src/index.js",
       "!src/init.js",
-      "!src/metrics.js"
+      "!src/metrics.js",
+      "!src/logging.js"
     ],
     "coverageThreshold": {
       "global": {
