@@ -4,6 +4,8 @@ const { Role, DB } = require('../database/database.js');
 const { authRouter } = require('./authRouter.js');
 const { asyncHandler, StatusCodeError } = require('../endpointHelper.js');
 
+const metrics = require('../metrics.js');
+
 const orderRouter = express.Router();
 
 orderRouter.endpoints = [
@@ -43,16 +45,20 @@ orderRouter.endpoints = [
 // getMenu
 orderRouter.get(
   '/menu',
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req, res, next) => {
+    metrics.incrementGetRequests();
     res.send(await DB.getMenu());
+    next();
   })
 );
+
 
 // addMenuItem
 orderRouter.put(
   '/menu',
   authRouter.authenticateToken,
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req, res, next) => {
+    metrics.incrementPostRequests();
     if (!req.user.isRole(Role.Admin)) {
       throw new StatusCodeError('unable to add menu item', 403);
     }
@@ -60,6 +66,7 @@ orderRouter.put(
     const addMenuItemReq = req.body;
     await DB.addMenuItem(addMenuItemReq);
     res.send(await DB.getMenu());
+      next();
   })
 );
 
@@ -67,8 +74,10 @@ orderRouter.put(
 orderRouter.get(
   '/',
   authRouter.authenticateToken,
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req, res, next) => {
+    metrics.incrementGetRequests();
     res.json(await DB.getOrders(req.user, req.query.page));
+    next();
   })
 );
 
@@ -76,21 +85,32 @@ orderRouter.get(
 orderRouter.post(
   '/',
   authRouter.authenticateToken,
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req, res, next) => {
+    metrics.incrementPostRequests();
+    const requestStartTime = performance.now();
     const orderReq = req.body;
     const order = await DB.addDinerOrder(req.user, orderReq);
+    const serviceStartTime = performance.now();
     const r = await fetch(`${config.factory.url}/api/order`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', authorization: `Bearer ${config.factory.apiKey}` },
       body: JSON.stringify({ diner: { id: req.user.id, name: req.user.name, email: req.user.email }, order }),
     });
     const j = await r.json();
+    const serviceEndTime = performance.now();
+    metrics.addPizzaFactoryLatency(serviceEndTime - serviceStartTime);
+    metrics.addServiceLatency(serviceEndTime - requestStartTime);
     if (r.ok) {
+        metrics.addPizzasSold(order.items.length);
+        metrics.addPizzaRevenue(order.items.reduce((acc, i) => acc + i.price, 0));
       res.send({ order, jwt: j.jwt, reportUrl: j.reportUrl });
     } else {
+        metrics.incrementPizzaCreationFailures();
       res.status(500).send({ message: 'Failed to fulfill order at factory', reportUrl: j.reportUrl });
     }
+    next();
   })
 );
+
 
 module.exports = orderRouter;

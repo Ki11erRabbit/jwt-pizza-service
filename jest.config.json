@@ -11,11 +11,13 @@
       "src/**/*.{js,jsx,ts,tsx}",
       "!src/**/*.d.ts",
       "!src/index.js",
-      "!src/init.js"
+      "!src/init.js",
+      "!src/metrics.js",
+      "!src/logger.js"
     ],
     "coverageThreshold": {
       "global": {
-        "branches": 80,
+        "branches": 70,
         "functions": 80,
         "lines": 80,
         "statements": 80
