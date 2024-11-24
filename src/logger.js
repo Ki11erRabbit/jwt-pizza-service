@@ -47,6 +47,9 @@ class Logger {
     console.log(event);
     console.log('Sending log to Grafana');
     const body = JSON.stringify(event);
+    console.log(body);
+    //console.log(config.logging.userId);
+    //console.log(config.logging.apiKey);
     fetch(`${config.logging.url}`, {
       method: 'post',
       body: body,

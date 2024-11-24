@@ -40,7 +40,7 @@ authRouter.endpoints = [
   },
 ];
 
-async function setAuthUser(req, res, next) {
+async function setAuthUser(req, res) {
   const token = readAuthToken(req);
   if (token) {
     try {
@@ -53,21 +53,19 @@ async function setAuthUser(req, res, next) {
       req.user = null;
     }
   }
-  next();
 }
 
 // Authenticate token
-authRouter.authenticateToken = (req, res, next) => {
+authRouter.authenticateToken = (req, res) => {
   if (!req.user) {
     return res.status(401).send({ message: 'unauthorized' });
   }
-  next();
 };
 
 // register
 authRouter.post(
   '/',
-  asyncHandler(async (req, res, next) => {
+  asyncHandler(async (req, res) => {
     metrics.incrementPostRequests();
     const serviceStartTime = performance.now();
     const { name, email, password } = req.body;
@@ -83,7 +81,6 @@ authRouter.post(
     }
     const serviceEndTime = performance.now();
     metrics.addServiceLatency(serviceEndTime - serviceStartTime);
-    next();
   })
 );
 
@@ -91,7 +88,7 @@ authRouter.post(
 // login
 authRouter.put(
   '/',
-  asyncHandler(async (req, res, next) => {
+  asyncHandler(async (req, res) => {
     metrics.incrementPutRequests();
     const serviceStartTime = performance.now();
     const { email, password } = req.body;
@@ -106,7 +103,6 @@ authRouter.put(
     }
     const serviceEndTime = performance.now();
     metrics.addServiceLatency(serviceEndTime - serviceStartTime)
-    next();
   })
 );
 
@@ -115,7 +111,7 @@ authRouter.put(
 authRouter.delete(
   '/',
   authRouter.authenticateToken,
-  asyncHandler(async (req, res, next) => {
+  asyncHandler(async (req, res) => {
     metrics.incrementDeleteRequests();
     const serviceStartTime = performance.now();
     await clearAuth(req);
@@ -123,7 +119,6 @@ authRouter.delete(
     metrics.decrementActiveUsers();
     const serviceEndTime = performance.now();
     metrics.addServiceLatency(serviceEndTime - serviceStartTime);
-      next();
   })
 );
 
@@ -131,7 +126,7 @@ authRouter.delete(
 authRouter.put(
   '/:userId',
   authRouter.authenticateToken,
-  asyncHandler(async (req, res, next) => {
+  asyncHandler(async (req, res) => {
     metrics.incrementPutRequests();
     const serviceStartTime = performance.now();
     const { email, password } = req.body;
@@ -147,7 +142,6 @@ authRouter.put(
     res.json(updatedUser);
     const serviceEndTime = performance.now();
     metrics.addServiceLatency(serviceEndTime - serviceStartTime)
-    next();
   })
 );
 
