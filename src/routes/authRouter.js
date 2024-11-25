@@ -4,7 +4,7 @@ const config = require('../config.js');
 const { asyncHandler } = require('../endpointHelper.js');
 const { DB, Role } = require('../database/database.js');
 const metrics = require('../metrics.js');
-
+const logger = require('../logger.js')
 const authRouter = express.Router();
 
 authRouter.endpoints = [
@@ -68,6 +68,7 @@ authRouter.post(
   asyncHandler(async (req, res) => {
     metrics.incrementPostRequests();
     const serviceStartTime = performance.now();
+    logger.logHttp(req, res);
     const { name, email, password } = req.body;
     if (!name || !email || !password) {
       return res.status(400).json({ message: 'name, email, and password are required' });
@@ -91,6 +92,7 @@ authRouter.put(
   asyncHandler(async (req, res) => {
     metrics.incrementPutRequests();
     const serviceStartTime = performance.now();
+    logger.logHttp(req, res);
     const { email, password } = req.body;
     const user = await DB.getUser(email, password);
     const auth = await setAuth(user);
@@ -114,6 +116,7 @@ authRouter.delete(
   asyncHandler(async (req, res) => {
     metrics.incrementDeleteRequests();
     const serviceStartTime = performance.now();
+    logger.logHttp(req, res);
     await clearAuth(req);
     res.json({ message: 'logout successful' });
     metrics.decrementActiveUsers();
@@ -129,6 +132,7 @@ authRouter.put(
   asyncHandler(async (req, res) => {
     metrics.incrementPutRequests();
     const serviceStartTime = performance.now();
+    logger.logHttp(req, res);
     const { email, password } = req.body;
     const userId = Number(req.params.userId);
     const user = req.user;

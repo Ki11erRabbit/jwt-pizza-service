@@ -142,7 +142,7 @@ class Metrics {
 
     sendMetricToGrafana(metricPrefix, httpMethod, metricName, metricValue) {
         const metric = this.generateMetric(metricPrefix, httpMethod, metricName, metricValue);
-        console.log(`Pushing metric to Grafana: ${metric}`);
+        //console.log(`Pushing metric to Grafana: ${metric}`);
 
         fetch(`${config.metrics.url}`, {
             method: 'post',
@@ -153,7 +153,7 @@ class Metrics {
             if (!response.ok) {
               console.error(`Failed to push metrics data to Grafana ${metric}`);
             } else {
-              console.log(`Pushed ${metric}`);
+              //console.log(`Pushed ${metric}`);
             }
         })
         .catch((error) => {
