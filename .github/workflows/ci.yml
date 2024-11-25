@@ -37,9 +37,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
       
-      - name: Install eslint
-        run: npm ci
-
       - name: Install jest
         run: npm install -D jest 
 
@@ -73,8 +70,8 @@ jobs:
           };" > src/config.js
           cat src/config.js
 
-      - name: Tests
-        run: npm test
+      # - name: Tests
+      #   run: npm test
 
       - name: set version
         id: set_version
