@@ -5,7 +5,7 @@ const franchiseRouter = require('./routes/franchiseRouter.js');
 const version = require('./version.json');
 const config = require('./config.js');
 const metrics = require('./metrics.js');
-// const logger = require('./logger.js');
+const logger = require('./logger.js');
 
 const app = express();
 app.use(express.json());
@@ -26,7 +26,7 @@ apiRouter.use('/franchise', franchiseRouter);
 
 apiRouter.use('/docs', (req, res) => {
   console.log('Hello');
-  // logger.logHttp(req, res);
+  logger.logHttp(req, res);
   res.json({
     version: version.version,
     endpoints: [...authRouter.endpoints, ...orderRouter.endpoints, ...franchiseRouter.endpoints],
@@ -36,7 +36,7 @@ apiRouter.use('/docs', (req, res) => {
 
 app.get('/', (req, res) => {
   console.log("hello")
-  // logger.logHttp(req, res);
+  logger.logHttp(req, res);
     metrics.incrementGetRequests();
   res.json({
     message: 'welcome to JWT Pizza',
@@ -45,7 +45,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/metrics', (req, res) => {
-  // logger.logHttp(req, res);
+  logger.logHttp(req, res);
     metrics.incrementGetRequests();
       const response = {
         string: metrics.getLastMetric()
@@ -61,7 +61,7 @@ app.use('*', (req, res) => {
 
 // Default error handler for all exceptions and errors.
 app.use((err, req, res, next) => {
-  // logger.logHttp(req, res);
+  logger.logHttp(req, res);
   res.status(err.statusCode ?? 500).json({ message: err.message, stack: err.stack });
   next();
 });

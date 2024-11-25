@@ -46,10 +46,11 @@ orderRouter.endpoints = [
 // getMenu
 orderRouter.get(
   '/menu',
-  asyncHandler(async (req, res) => {
-    logger.logHttp(req, res);
+  asyncHandler(async (req, res, next) => {
     metrics.incrementGetRequests();
+    logger.logHttp(req, res);
     res.send(await DB.getMenu());
+    next();
   })
 );
 
@@ -58,9 +59,9 @@ orderRouter.get(
 orderRouter.put(
   '/menu',
   authRouter.authenticateToken,
-  asyncHandler(async (req, res) => {
-    logger.logHttp(req, res);
+  asyncHandler(async (req, res, next) => {
     metrics.incrementPostRequests();
+    logger.logHttp(req, res);
     if (!req.user.isRole(Role.Admin)) {
       throw new StatusCodeError('unable to add menu item', 403);
     }
@@ -68,6 +69,7 @@ orderRouter.put(
     const addMenuItemReq = req.body;
     await DB.addMenuItem(addMenuItemReq);
     res.send(await DB.getMenu());
+      next();
   })
 );
 
@@ -75,10 +77,11 @@ orderRouter.put(
 orderRouter.get(
   '/',
   authRouter.authenticateToken,
-  asyncHandler(async (req, res) => {
-    logger.logHttp(req, res);
+  asyncHandler(async (req, res, next) => {
     metrics.incrementGetRequests();
+    logger.logHttp(req, res);
     res.json(await DB.getOrders(req.user, req.query.page));
+    next();
   })
 );
 
@@ -86,7 +89,7 @@ orderRouter.get(
 orderRouter.post(
   '/',
   authRouter.authenticateToken,
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req, res, next) => {
     metrics.incrementPostRequests();
     const requestStartTime = performance.now();
     logger.logHttp(req, res);
@@ -110,6 +113,7 @@ orderRouter.post(
         metrics.incrementPizzaCreationFailures();
       res.status(500).send({ message: 'Failed to fulfill order at factory', reportUrl: j.reportUrl });
     }
+    next();
   })
 );
 

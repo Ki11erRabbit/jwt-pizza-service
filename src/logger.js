@@ -30,14 +30,14 @@ class Logger {
       method: req.method,
       statusCode: res.statusCode,
       reqBody: JSON.stringify(req.body),
-      resBody: JSON.stringify(resBody),
+      // resBody: JSON.stringify(resBody),
     };
     const level = this.statusToLogLevel(res.statusCode);
     this.log(level, 'http', logData);
   }
 
   log(level, type, logData) {
-    const labels = { component: config.source, level: level, type: type };
+    const labels = { component: config.logging.source, level: level, type: type };
     const values = [this.nowString(), this.sanitize(logData)];
     const logEvent = { streams: [{ stream: labels, values: [values] }] };
 
@@ -60,12 +60,12 @@ class Logger {
   }
 
   sendLogToGrafana(event) {
-    console.log(event);
-    console.log('Sending log to Grafana');
+    // console.log(event);
+    // console.log('Sending log to Grafana');
     const body = JSON.stringify(event);
-    console.log(body);
-    //console.log(config.logging.userId);
-    //console.log(config.logging.apiKey);
+    // console.log(body);
+    // console.log(config.logging.userId);
+    // console.log(config.logging.apiKey);
     fetch(`${config.logging.url}`, {
       method: 'post',
       body: body,
@@ -75,7 +75,7 @@ class Logger {
       },
     }).then((res) => {
         console.log('Log sent to Grafana');
-        console.log(res);
+        // console.log(res);
       if (!res.ok) console.log('Failed to send log to Grafana');
     });
   }
