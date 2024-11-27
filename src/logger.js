@@ -23,7 +23,7 @@ class Logger {
   };
 
   logHttp(req, res) {
-    console.log("logging http");
+    // console.log("logging http");
     const logData = {
       authorized: !!req.headers.authorization,
       path: req.path,
@@ -34,6 +34,30 @@ class Logger {
     };
     const level = this.statusToLogLevel(res.statusCode);
     this.log(level, 'http', logData);
+  }
+
+  logSQL(query, parameters = [], sanitize = [], additional = "") {
+    console.log('Sending sql log')
+    let new_params = []
+    let i = 0;
+    for (i = 0; i < parameters.length; i ++) {
+      if (sanitize.includes(i)) {
+        new_params.push("*****");
+      } else {
+        new_params.push(parameters[i]);
+      }
+    }
+    const logData = {
+      query: query,
+      parameters: new_params,
+      additional: additional,
+    };
+
+    const labels = { component: config.logging.source, level: 'info', type: 'sql' };
+    const values = [this.nowString(), JSON.stringify(logData)];
+    const logEvent = { streams: [{ stream: labels, values: [values] }] };
+
+    this.sendLogToGrafana(logEvent);
   }
 
   log(level, type, logData) {
@@ -60,10 +84,10 @@ class Logger {
   }
 
   sendLogToGrafana(event) {
-    // console.log(event);
+    console.log(event);
     // console.log('Sending log to Grafana');
     const body = JSON.stringify(event);
-    // console.log(body);
+    console.log(body);
     // console.log(config.logging.userId);
     // console.log(config.logging.apiKey);
     fetch(`${config.logging.url}`, {
