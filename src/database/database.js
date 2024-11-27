@@ -60,7 +60,7 @@ class DB {
           default: {
             query = `INSERT INTO userRole (userId, role, objectId) VALUES (?, ?, ?)`;
             parameters = [userId, role.role, 0];
-            logger.logSQL(query,parameters, additional = "Add user default branch")
+            logger.logSQL(query,parameters, [], "Add user default branch")
             await this.query(connection, query, parameters);
             break;
           }
@@ -181,7 +181,7 @@ class DB {
       const outer_query = `SELECT id, franchiseId, storeId, date FROM dinerOrder WHERE dinerId=? LIMIT ?,?`;
       const outer_query_parameters = [user.id, offset, config.db.listPerPage]
 
-      logger.logSQL(outer_query, outer_query_parameters, additional = "Scrutinize");
+      logger.logSQL(outer_query, outer_query_parameters, [], "Scrutinize");
 
       const offset = this.getOffset(page, config.db.listPerPage);
       const orders = await this.query(connection, outer_query, outer_query_parameters);
