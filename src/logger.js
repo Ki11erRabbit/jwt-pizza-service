@@ -37,7 +37,7 @@ class Logger {
   }
 
   logSQL(query, parameters = [], sanitize = [], additional = "") {
-    console.log('Sending sql log')
+    // console.log('Sending sql log')
     let new_params = []
     let i = 0;
     for (i = 0; i < parameters.length; i ++) {
@@ -84,10 +84,10 @@ class Logger {
   }
 
   sendLogToGrafana(event) {
-    console.log(event);
+    // console.log(event);
     // console.log('Sending log to Grafana');
     const body = JSON.stringify(event);
-    console.log(body);
+    // console.log(body);
     // console.log(config.logging.userId);
     // console.log(config.logging.apiKey);
     fetch(`${config.logging.url}`, {
@@ -98,7 +98,7 @@ class Logger {
         Authorization: `Bearer ${config.logging.userId}:${config.logging.apiKey}`,
       },
     }).then((res) => {
-        console.log('Log sent to Grafana');
+        // console.log('Log sent to Grafana');
         // console.log(res);
       if (!res.ok) console.log('Failed to send log to Grafana');
     });

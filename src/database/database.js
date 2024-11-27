@@ -41,7 +41,7 @@ class DB {
     try {
       const hashedPassword = await bcrypt.hash(user.password, 10);
       let query = `INSERT INTO user (name, email, password) VALUES (?, ?, ?)`;
-      let parameters = [user.name, user.email, hashedPassword];
+      let parameters = [`'${user.name}'`, user.email, hashedPassword];
 
       logger.logSQL(query, parameters, [2]);
 
@@ -428,6 +428,8 @@ class DB {
   }
 
   async query(connection, sql, params) {
+    console.log(sql);
+    console.log(params);
     const [results] = await connection.execute(sql, params);
     return results;
   }

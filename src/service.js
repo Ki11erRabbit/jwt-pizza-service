@@ -25,7 +25,7 @@ apiRouter.use('/order', orderRouter);
 apiRouter.use('/franchise', franchiseRouter);
 
 apiRouter.use('/docs', (req, res) => {
-  console.log('Hello');
+  // console.log('Hello');
   logger.logHttp(req, res);
   res.json({
     version: version.version,
@@ -35,7 +35,7 @@ apiRouter.use('/docs', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  console.log("hello")
+  // console.log("hello")
   logger.logHttp(req, res);
     metrics.incrementGetRequests();
   res.json({
