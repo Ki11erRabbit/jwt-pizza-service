@@ -119,7 +119,7 @@ class DB {
         parameters.push(`'${email}'`)
         //params.push(`email='${email}'`);
       }
-      if (params.length > 0) {
+      if (parameters.length > 0) {
         const query = `UPDATE user SET ${query_params.join(', ')} WHERE id=?`;
         parameters.push(`${userId}`)
 
@@ -336,7 +336,13 @@ class DB {
       }
 
       franchiseIds = franchiseIds.map((v) => v.objectId);
-      let franchisePlaceholder = franchiseIds.map((v) => "?");
+      let franchisePlaceholder = franchiseIds.map((v) => {
+        if (v !== undefined) {
+          return "?"
+        } else {
+          return "?"
+        }
+      });
 
       const bottom_query = `SELECT id, name FROM franchise WHERE id in (${franchisePlaceholder.join(',')})`
       const bottom_params = franchiseIds;
@@ -430,7 +436,7 @@ class DB {
     const query = `SELECT id FROM ? WHERE ?=?`
     const parameters = [table, key, value]
 
-    logger.logSQL(query, parameters, additional = "Scrutinize");
+    logger.logSQL(query, parameters, [], "Scrutinize");
 
     const [rows] = await connection.execute(query, parameters);
     if (rows.length > 0) {
