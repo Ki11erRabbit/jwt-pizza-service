@@ -79,14 +79,17 @@ authRouter.post(
     }
     const user = await DB.addUser({ name, email, password, roles: [{ role: Role.Diner }] });
     const auth = await setAuth(user);
-    res.json({ user: user, token: auth });
+    
     if (user) {
         metrics.incrementSuccessfulLogins();
         metrics.incrementActiveUsers();
     }
+    
     const serviceEndTime = performance.now();
     logger.logHttp(req, res);
     metrics.addServiceLatency(serviceEndTime - serviceStartTime);
+    
+    res.json({ user: user, token: auth });
   })
 );
 
@@ -100,7 +103,7 @@ authRouter.put(
     const { email, password } = req.body;
     const user = await DB.getUser(email, password);
     const auth = await setAuth(user);
-    res.json({ user: user, token: auth });
+    
     if (user) {
         metrics.incrementSuccessfulLogins();
         metrics.incrementActiveUsers();
@@ -110,6 +113,7 @@ authRouter.put(
     logger.logHttp(req, res);
     const serviceEndTime = performance.now();
     metrics.addServiceLatency(serviceEndTime - serviceStartTime)
+    res.json({ user: user, token: auth });
     next();
   })
 );
@@ -123,11 +127,11 @@ authRouter.delete(
     metrics.incrementDeleteRequests();
     const serviceStartTime = performance.now();
     await clearAuth(req);
-    res.json({ message: 'logout successful' });
     metrics.decrementActiveUsers();
     logger.logHttp(req, res);
     const serviceEndTime = performance.now();
     metrics.addServiceLatency(serviceEndTime - serviceStartTime);
+    res.json({ message: 'logout successful' });
     next();
   })
 );
@@ -149,10 +153,10 @@ authRouter.put(
     }
 
     const updatedUser = await DB.updateUser(userId, email, password);
-    res.json(updatedUser);
     logger.logHttp(req, res);
     const serviceEndTime = performance.now();
     metrics.addServiceLatency(serviceEndTime - serviceStartTime)
+    res.json(updatedUser);
     next();
   })
 );

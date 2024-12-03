@@ -136,8 +136,9 @@ franchiseRouter.post(
       throw new StatusCodeError('unable to create a store', 403);
     }
 
-    res.send(await DB.createStore(franchise.id, req.body));
+    
     logger.logHttp(req, res);
+    res.send(await DB.createStore(franchise.id, req.body));
       next();
   })
 );
@@ -157,8 +158,9 @@ franchiseRouter.delete(
 
     const storeId = Number(req.params.storeId);
     await DB.deleteStore(franchiseId, storeId);
-    res.json({ message: 'store deleted' });
     logger.logHttp(req, res);
+
+    res.json({ message: 'store deleted' });
       next();
   })
 );
