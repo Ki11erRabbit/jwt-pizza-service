@@ -94,10 +94,9 @@ authRouter.post(
 // login
 authRouter.put(
   '/',
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req, res, next) => {
     metrics.incrementPutRequests();
     const serviceStartTime = performance.now();
-    logger.logHttp(req, res);
     const { email, password } = req.body;
     const user = await DB.getUser(email, password);
     const auth = await setAuth(user);
@@ -108,8 +107,10 @@ authRouter.put(
     } else {
         metrics.incrementFailedLogins();
     }
+    logger.logHttp(req, res);
     const serviceEndTime = performance.now();
     metrics.addServiceLatency(serviceEndTime - serviceStartTime)
+    next();
   })
 );
 
@@ -118,15 +119,16 @@ authRouter.put(
 authRouter.delete(
   '/',
   authRouter.authenticateToken,
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req, res, next) => {
     metrics.incrementDeleteRequests();
     const serviceStartTime = performance.now();
-    logger.logHttp(req, res);
     await clearAuth(req);
     res.json({ message: 'logout successful' });
     metrics.decrementActiveUsers();
+    logger.logHttp(req, res);
     const serviceEndTime = performance.now();
     metrics.addServiceLatency(serviceEndTime - serviceStartTime);
+    next();
   })
 );
 
@@ -134,10 +136,9 @@ authRouter.delete(
 authRouter.put(
   '/:userId',
   authRouter.authenticateToken,
-  asyncHandler(async (req, res) => {
+  asyncHandler(async (req, res, next) => {
     metrics.incrementPutRequests();
     const serviceStartTime = performance.now();
-    logger.logHttp(req, res);
     const { email, password } = req.body;
     const userId = Number(req.params.userId);
     const user = req.user;
@@ -149,8 +150,10 @@ authRouter.put(
 
     const updatedUser = await DB.updateUser(userId, email, password);
     res.json(updatedUser);
+    logger.logHttp(req, res);
     const serviceEndTime = performance.now();
     metrics.addServiceLatency(serviceEndTime - serviceStartTime)
+    next();
   })
 );
 
