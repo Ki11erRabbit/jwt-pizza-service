@@ -26,12 +26,13 @@ apiRouter.use('/franchise', franchiseRouter);
 
 apiRouter.use('/docs', (req, res) => {
   // console.log('Hello');
-  logger.logHttp(req, res);
+  
   res.json({
     version: version.version,
     endpoints: [...authRouter.endpoints, ...orderRouter.endpoints, ...franchiseRouter.endpoints],
     config: { factory: config.factory.url, db: config.db.connection.host },
   });
+  logger.logHttp(req, res);
 });
 
 app.get('/', (req, res) => {
@@ -54,16 +55,16 @@ app.get('/metrics', (req, res) => {
 });
 
 app.use('*', (req, res) => {
-  res.status(404).json({
+  return res.status(404).json({
     message: 'unknown endpoint',
   });
 });
 
 // Default error handler for all exceptions and errors.
-app.use((err, req, res, next) => {
+/*app.use((err, req, res, next) => {
   res.status(err.statusCode ?? 500).json({ message: err.message, stack: err.stack });
   logger.logHttp(req, res);
   next();
-});
+});*/
 
 module.exports = app;
