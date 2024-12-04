@@ -30,7 +30,7 @@ class Logger {
       method: req.method,
       statusCode: res.statusCode,
       reqBody: JSON.stringify(req.body),
-      resBody: JSON.stringify(resBody),
+      resBody: JSON.stringify(res.body),
     };
     const level = this.statusToLogLevel(res.statusCode);
     this.log(level, 'http', logData);
