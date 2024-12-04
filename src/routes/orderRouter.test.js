@@ -106,7 +106,7 @@ test('create order with bad request', async () => {
     const createStoreRes = await request(app).post(`/api/franchise/${franchiseId}/store`).set('Authorization', `Bearer ${testUserAuthToken}`).send({ name: 'store' });
 
     expect(createStoreRes.status).toBe(200);
-    const storeId = createStoreRes.body.id;
+    //const storeId = createStoreRes.body.id;
 
     const addRes = await request(app).put('/api/order/menu').set('Authorization', `Bearer ${testUserAuthToken}`).send({ title:"Bread", description: "No topping, no sauce, just carbs", image:"pizza9.png", price: 10 });
     expect(addRes.status).toBe(200);
