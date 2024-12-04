@@ -155,9 +155,9 @@ test('create franchise not admin', async () => {
     const loginRes = await request(app).put('/api/auth').send(testUser);
     const userAuthToken = loginRes.body.token;
     const franchise = { name: 'franchise' + randomName() + randomName(), admins: [testUser] };
-    console.log('userAuthToken', userAuthToken);
+    // console.log('userAuthToken', userAuthToken);
     const createRes = await request(app).post('/api/franchise').set('Authorization', `Bearer ${userAuthToken}`).send(franchise);
-    console.log('result', JSON.stringify(createRes));
+    // console.log('result', JSON.stringify(createRes));
     expect(createRes.body.message).toBe('unable to create a franchise');
     expect(createRes.status).toBe(403);
 })
@@ -190,7 +190,7 @@ test('create franchise store not admin', async () => {
     const adminUser = await createAdminUser();
     const adminLoginRes = await request(app).put('/api/auth').send(adminUser);
     const adminTestUserAuthToken = adminLoginRes.body.token;
-    console.log('adminTestUserAuthToken', adminTestUserAuthToken);
+    // console.log('adminTestUserAuthToken', adminTestUserAuthToken);
     const franchise = { name: 'franchise' + randomName(), admins: [adminUser] };
     const createFranchiseRes = await request(app).post('/api/franchise').set('Authorization', `Bearer ${adminTestUserAuthToken}`).send(franchise);
 
@@ -211,7 +211,7 @@ test('delete franchise store not admin', async () => {
     const adminUser = await createAdminUser();
     const adminLoginRes = await request(app).put('/api/auth').send(adminUser);
     const adminTestUserAuthToken = adminLoginRes.body.token;
-    console.log('adminTestUserAuthToken', adminTestUserAuthToken);
+    // console.log('adminTestUserAuthToken', adminTestUserAuthToken);
     const franchise = { name: 'franchise' + randomName(), admins: [adminUser] };
     const createFranchiseRes = await request(app).post('/api/franchise').set('Authorization', `Bearer ${adminTestUserAuthToken}`).send(franchise);
 
