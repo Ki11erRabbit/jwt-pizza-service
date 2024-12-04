@@ -184,6 +184,7 @@ class DB {
       const outer_query = `SELECT id, franchiseId, storeId, date FROM dinerOrder WHERE dinerId=? LIMIT ?,?`;
       console.log('created string');
       console.log(user.id);
+      const offset = this.getOffset(page, config.db.listPerPage);
       console.log(offset);
       console.log(10);
       const outer_query_parameters = [user.id, offset, config.db.listPerPage]
@@ -192,7 +193,7 @@ class DB {
       logger.logSQL(outer_query, outer_query_parameters, [], "Scrutinize");
       console.log('logged sql');
 
-      const offset = this.getOffset(page, config.db.listPerPage);
+      
       const orders = await this.query(connection, outer_query, outer_query_parameters);
       console.log(orders);
       for (const order of orders) {
@@ -205,7 +206,11 @@ class DB {
         order.items = items;
       }
       return { dinerId: user.id, orders: orders, page };
-    } finally {
+    } 
+    catch (err) {
+      console.log(err);
+    }
+    finally {
       console.log('closing connection');
       connection.end();
     }
@@ -214,6 +219,7 @@ class DB {
   async addDinerOrder(user, order) {
     const connection = await this.getConnection();
     try {
+      console.log('sql1');
       const outer_query = `INSERT INTO dinerOrder (dinerId, franchiseId, storeId, date) VALUES (?, ?, ?, now())`;
       const outer_query_parameters = [user.id, order.franchiseId, order.storeId];
 
@@ -229,10 +235,15 @@ class DB {
 
         logger.logSQL(query, parameters);
 
+        console.log('sql2');
         await this.query(connection, query, parameters);
       }
       return { ...order, id: orderId };
-    } finally {
+    }
+    catch (err) {
+      console.log(err);
+    }
+     finally {
       connection.end();
     }
   }
@@ -446,8 +457,23 @@ class DB {
   }
 
   async getID(connection, key, value, table) {
-    const query = `SELECT id FROM ? WHERE ?=?`
-    const parameters = [table, key, value]
+
+    switch (table) {
+      case "auth":
+      case "dinerOrder":
+      case "franchise":
+      case "menu":
+      case "orderItem":
+      case "store":
+      case "user":
+      case "userRole":
+        break;
+      default:
+        throw new Error('Invalid table');
+    }
+
+    const query = `SELECT id FROM ${table} WHERE ${key}=?`
+    const parameters = [value]
 
     logger.logSQL(query, parameters, [], "Scrutinize");
 
