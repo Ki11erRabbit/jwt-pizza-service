@@ -67,7 +67,11 @@ class DB {
         }
       }
       return { ...user, id: userId, password: undefined };
-    } finally {
+    }
+    catch (err) {
+      console.log(err);
+    }
+    finally {
       connection.end();
     }
   }
@@ -190,8 +194,8 @@ class DB {
       logger.logSQL(outer_query, outer_query_parameters, [], "Scrutinize");
 
       
+      // console.log(orders);
       const orders = await this.query(connection, outer_query, outer_query_parameters);
-      console.log(orders);
       for (const order of orders) {
         const inner_query = `SELECT id, menuId, description, price FROM orderItem WHERE orderId=?`;
         const inner_query_params = [order.id];
