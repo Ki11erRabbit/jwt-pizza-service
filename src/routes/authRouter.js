@@ -4,6 +4,7 @@ const config = require('../config.js');
 const { asyncHandler } = require('../endpointHelper.js');
 const { DB, Role } = require('../database/database.js');
 const metrics = require('../metrics.js');
+const logger = require('../logger.js')
 
 const authRouter = express.Router();
 
@@ -67,23 +68,28 @@ authRouter.authenticateToken = (req, res, next) => {
 // register
 authRouter.post(
   '/',
-  asyncHandler(async (req, res, next) => {
+  asyncHandler(async (req, res) => {
     metrics.incrementPostRequests();
     const serviceStartTime = performance.now();
+    
     const { name, email, password } = req.body;
     if (!name || !email || !password) {
+      logger.logHttp(req, res);
       return res.status(400).json({ message: 'name, email, and password are required' });
     }
     const user = await DB.addUser({ name, email, password, roles: [{ role: Role.Diner }] });
     const auth = await setAuth(user);
-    res.json({ user: user, token: auth });
+    
     if (user) {
         metrics.incrementSuccessfulLogins();
         metrics.incrementActiveUsers();
     }
+    
     const serviceEndTime = performance.now();
+    logger.logHttp(req, res);
     metrics.addServiceLatency(serviceEndTime - serviceStartTime);
-    next();
+    
+    res.json({ user: user, token: auth });
   })
 );
 
@@ -97,15 +103,17 @@ authRouter.put(
     const { email, password } = req.body;
     const user = await DB.getUser(email, password);
     const auth = await setAuth(user);
-    res.json({ user: user, token: auth });
+    
     if (user) {
         metrics.incrementSuccessfulLogins();
         metrics.incrementActiveUsers();
     } else {
         metrics.incrementFailedLogins();
     }
+    logger.logHttp(req, res);
     const serviceEndTime = performance.now();
     metrics.addServiceLatency(serviceEndTime - serviceStartTime)
+    res.json({ user: user, token: auth });
     next();
   })
 );
@@ -119,11 +127,12 @@ authRouter.delete(
     metrics.incrementDeleteRequests();
     const serviceStartTime = performance.now();
     await clearAuth(req);
-    res.json({ message: 'logout successful' });
     metrics.decrementActiveUsers();
+    logger.logHttp(req, res);
     const serviceEndTime = performance.now();
     metrics.addServiceLatency(serviceEndTime - serviceStartTime);
-      next();
+    res.json({ message: 'logout successful' });
+    next();
   })
 );
 
@@ -144,9 +153,10 @@ authRouter.put(
     }
 
     const updatedUser = await DB.updateUser(userId, email, password);
-    res.json(updatedUser);
+    logger.logHttp(req, res);
     const serviceEndTime = performance.now();
     metrics.addServiceLatency(serviceEndTime - serviceStartTime)
+    res.json(updatedUser);
     next();
   })
 );

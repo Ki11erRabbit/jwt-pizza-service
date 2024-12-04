@@ -3,6 +3,7 @@ const config = require('../config.js');
 const { Role, DB } = require('../database/database.js');
 const { authRouter } = require('./authRouter.js');
 const { asyncHandler, StatusCodeError } = require('../endpointHelper.js');
+const logger = require('../logger.js');
 
 const metrics = require('../metrics.js');
 
@@ -47,6 +48,7 @@ orderRouter.get(
   '/menu',
   asyncHandler(async (req, res, next) => {
     metrics.incrementGetRequests();
+    logger.logHttp(req, res);
     res.send(await DB.getMenu());
     next();
   })
@@ -60,12 +62,15 @@ orderRouter.put(
   asyncHandler(async (req, res, next) => {
     metrics.incrementPostRequests();
     if (!req.user.isRole(Role.Admin)) {
+      logger.logHttp(req, res);
       throw new StatusCodeError('unable to add menu item', 403);
     }
 
     const addMenuItemReq = req.body;
     await DB.addMenuItem(addMenuItemReq);
+    logger.logHttp(req, res);
     res.send(await DB.getMenu());
+    
       next();
   })
 );
@@ -76,6 +81,8 @@ orderRouter.get(
   authRouter.authenticateToken,
   asyncHandler(async (req, res, next) => {
     metrics.incrementGetRequests();
+    
+    logger.logHttp(req, res);
     res.json(await DB.getOrders(req.user, req.query.page));
     next();
   })
@@ -88,6 +95,7 @@ orderRouter.post(
   asyncHandler(async (req, res, next) => {
     metrics.incrementPostRequests();
     const requestStartTime = performance.now();
+    logger.logHttp(req, res);
     const orderReq = req.body;
     const order = await DB.addDinerOrder(req.user, orderReq);
     const serviceStartTime = performance.now();
@@ -108,6 +116,7 @@ orderRouter.post(
         metrics.incrementPizzaCreationFailures();
       res.status(500).send({ message: 'Failed to fulfill order at factory', reportUrl: j.reportUrl });
     }
+    
     next();
   })
 );
