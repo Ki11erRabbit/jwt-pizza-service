@@ -45,6 +45,7 @@ test('add menu item', async () => {
 
 test('get orders for user', async () => {
     const loginRes = await request(app).put('/api/auth').send(testUser);
+    expect(loginRes.status).toBe(200);
     const testUserAuthToken = loginRes.body.token;
     const getRes = await request(app).get('/api/order').set('Authorization', `Bearer ${testUserAuthToken}`);
     expect(getRes.status).toBe(200);

@@ -176,15 +176,25 @@ class DB {
   }
 
   async getOrders(user, page = 1) {
+    console.log('connecting to db');
     const connection = await this.getConnection();
+    console.log('connected to db');
     try {
+      console.log('creating string');
       const outer_query = `SELECT id, franchiseId, storeId, date FROM dinerOrder WHERE dinerId=? LIMIT ?,?`;
+      console.log('created string');
+      console.log(user.id);
+      console.log(offset);
+      console.log(10);
       const outer_query_parameters = [user.id, offset, config.db.listPerPage]
 
+      console.log('logging sql');
       logger.logSQL(outer_query, outer_query_parameters, [], "Scrutinize");
+      console.log('logged sql');
 
       const offset = this.getOffset(page, config.db.listPerPage);
       const orders = await this.query(connection, outer_query, outer_query_parameters);
+      console.log(orders);
       for (const order of orders) {
         const inner_query = `SELECT id, menuId, description, price FROM orderItem WHERE orderId=?`;
         const inner_query_params = [order.id];
@@ -196,6 +206,7 @@ class DB {
       }
       return { dinerId: user.id, orders: orders, page };
     } finally {
+      console.log('closing connection');
       connection.end();
     }
   }

@@ -80,10 +80,13 @@ orderRouter.get(
   '/',
   authRouter.authenticateToken,
   asyncHandler(async (req, res, next) => {
+    console.log("get orders");
     metrics.incrementGetRequests();
     
     logger.logHttp(req, res);
+    console.log("getting orders");
     res.json(await DB.getOrders(req.user, req.query.page));
+    console.log("got orders");
     next();
   })
 );
