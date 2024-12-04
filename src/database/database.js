@@ -471,6 +471,9 @@ class DB {
       default:
         throw new Error('Invalid table');
     }
+    if (key.includes(' ') || key.includes(',') || key.includes(';')) {
+      throw new Error('Invalid key');
+    }
 
     const query = `SELECT id FROM ${table} WHERE ${key}=?`
     const parameters = [value]
