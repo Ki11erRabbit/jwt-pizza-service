@@ -121,6 +121,7 @@ class DB {
       }
       if (parameters.length > 0) {
         const query = `UPDATE user SET ${query_params.join(', ')} WHERE id=?`;
+        console.log(query);
         parameters.push(`${userId}`)
 
         logger.logSQL(query, parameters, sanitize, "Scrutinize")
@@ -128,7 +129,11 @@ class DB {
         await this.query(connection, query, parameters);
       }
       return this.getUser(email, password);
-    } finally {
+    }
+    catch (err) {
+      console.log(err);
+    }
+    finally {
       connection.end();
     }
   }
@@ -176,22 +181,13 @@ class DB {
   }
 
   async getOrders(user, page = 1) {
-    console.log('connecting to db');
     const connection = await this.getConnection();
-    console.log('connected to db');
     try {
-      console.log('creating string');
       const outer_query = `SELECT id, franchiseId, storeId, date FROM dinerOrder WHERE dinerId=? LIMIT ?,?`;
-      console.log('created string');
-      console.log(user.id);
       const offset = this.getOffset(page, config.db.listPerPage);
-      console.log(offset);
-      console.log(10);
       const outer_query_parameters = [user.id, offset, config.db.listPerPage]
 
-      console.log('logging sql');
       logger.logSQL(outer_query, outer_query_parameters, [], "Scrutinize");
-      console.log('logged sql');
 
       
       const orders = await this.query(connection, outer_query, outer_query_parameters);
@@ -219,7 +215,6 @@ class DB {
   async addDinerOrder(user, order) {
     const connection = await this.getConnection();
     try {
-      console.log('sql1');
       const outer_query = `INSERT INTO dinerOrder (dinerId, franchiseId, storeId, date) VALUES (?, ?, ?, now())`;
       const outer_query_parameters = [user.id, order.franchiseId, order.storeId];
 
@@ -235,7 +230,6 @@ class DB {
 
         logger.logSQL(query, parameters);
 
-        console.log('sql2');
         await this.query(connection, query, parameters);
       }
       return { ...order, id: orderId };
