@@ -67,9 +67,9 @@ test('create order for user', async () => {
     expect(addRes.status).toBe(200);
 
     const menuId = addRes.body[0].id;
-    console.log("menuId", menuId);
-    console.log("storeId", storeId);
-    console.log("franchiseId", franchiseId);
+    // console.log("menuId", menuId);
+    // console.log("storeId", storeId);
+    // console.log("franchiseId", franchiseId);
 
     const createRes = await request(app).post('/api/order').set('Authorization', `Bearer ${testUserAuthToken}`).send({ franchiseId: franchiseId, storeId: storeId, items:[{ menuId: menuId, description: "Bread", price: 10 }] });
     expect(createRes.status).toBe(200);
@@ -112,9 +112,9 @@ test('create order with bad request', async () => {
     expect(addRes.status).toBe(200);
 
     const menuId = addRes.body[0].id;
-    console.log("menuId", menuId);
-    console.log("storeId", storeId);
-    console.log("franchiseId", franchiseId);
+    // console.log("menuId", menuId);
+    // console.log("storeId", storeId);
+    // console.log("franchiseId", franchiseId);
 
     const createRes = await request(app).post('/api/order').set('Authorization', `Bearer ${testUserAuthToken}`).send({ items:[{ menuId: menuId, description: "Bread", price: 10 }] });
     expect(createRes.status).toBe(500);
