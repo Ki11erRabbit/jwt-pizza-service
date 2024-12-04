@@ -114,18 +114,17 @@ class DB {
       if (password) {
         const hashedPassword = await bcrypt.hash(password, 10);
         query_params.push("password=?");
-        parameters.push(`'${hashedPassword}'`);
+        parameters.push(`${hashedPassword}`);
         sanitize.push(0);
         //params.push(`password='${hashedPassword}'`);
       }
       if (email) {
         query_params.push("email=?");
-        parameters.push(`'${email}'`)
+        parameters.push(`${email}`)
         //params.push(`email='${email}'`);
       }
       if (parameters.length > 0) {
         const query = `UPDATE user SET ${query_params.join(', ')} WHERE id=?`;
-        console.log(query);
         parameters.push(`${userId}`)
 
         logger.logSQL(query, parameters, sanitize, "Scrutinize")
