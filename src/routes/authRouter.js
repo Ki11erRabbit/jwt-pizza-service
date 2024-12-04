@@ -97,7 +97,7 @@ authRouter.post(
 // login
 authRouter.put(
   '/',
-  asyncHandler(async (req, res, next) => {
+  asyncHandler(async (req, res) => {
     metrics.incrementPutRequests();
     const serviceStartTime = performance.now();
     const { email, password } = req.body;
@@ -114,7 +114,6 @@ authRouter.put(
     const serviceEndTime = performance.now();
     metrics.addServiceLatency(serviceEndTime - serviceStartTime)
     res.json({ user: user, token: auth });
-    next();
   })
 );
 
@@ -123,7 +122,7 @@ authRouter.put(
 authRouter.delete(
   '/',
   authRouter.authenticateToken,
-  asyncHandler(async (req, res, next) => {
+  asyncHandler(async (req, res) => {
     metrics.incrementDeleteRequests();
     const serviceStartTime = performance.now();
     await clearAuth(req);
@@ -132,7 +131,6 @@ authRouter.delete(
     const serviceEndTime = performance.now();
     metrics.addServiceLatency(serviceEndTime - serviceStartTime);
     res.json({ message: 'logout successful' });
-    next();
   })
 );
 
@@ -140,7 +138,7 @@ authRouter.delete(
 authRouter.put(
   '/:userId',
   authRouter.authenticateToken,
-  asyncHandler(async (req, res, next) => {
+  asyncHandler(async (req, res) => {
     metrics.incrementPutRequests();
     const serviceStartTime = performance.now();
     const { email, password } = req.body;
@@ -157,7 +155,6 @@ authRouter.put(
     const serviceEndTime = performance.now();
     metrics.addServiceLatency(serviceEndTime - serviceStartTime)
     res.json(updatedUser);
-    next();
   })
 );
 
