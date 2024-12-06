@@ -113,6 +113,8 @@ orderRouter.post(
       res.send({ order, jwt: j.jwt, reportUrl: j.reportUrl });
     } else {
         metrics.incrementPizzaCreationFailures();
+        // console.log(r);
+        // console.log(j);
       res.status(500).send({ message: 'Failed to fulfill order at factory', reportUrl: j.reportUrl });
     }
     logger.logHttp(req, res);
