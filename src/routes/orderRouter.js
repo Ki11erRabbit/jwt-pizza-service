@@ -80,13 +80,10 @@ orderRouter.get(
   '/',
   authRouter.authenticateToken,
   asyncHandler(async (req, res, next) => {
-    console.log("get orders");
     metrics.incrementGetRequests();
     
-    logger.logHttp(req, res);
-    console.log("getting orders");
     res.json(await DB.getOrders(req.user, req.query.page));
-    console.log("got orders");
+    logger.logHttp(req, res);
     next();
   })
 );
@@ -98,7 +95,6 @@ orderRouter.post(
   asyncHandler(async (req, res, next) => {
     metrics.incrementPostRequests();
     const requestStartTime = performance.now();
-    logger.logHttp(req, res);
     const orderReq = req.body;
     const order = await DB.addDinerOrder(req.user, orderReq);
     const serviceStartTime = performance.now();
@@ -119,6 +115,7 @@ orderRouter.post(
         metrics.incrementPizzaCreationFailures();
       res.status(500).send({ message: 'Failed to fulfill order at factory', reportUrl: j.reportUrl });
     }
+    logger.logHttp(req, res);
     
     next();
   })
