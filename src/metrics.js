@@ -107,6 +107,9 @@ class Metrics {
     }
     decrementActiveUsers() {
         this.activeUserCount--;
+        if (this.activeUserCount < 0) {
+            this.activeUserCount = 0;
+        }
     }
     incrementSuccessfulLogins() {
         this.successfulLogins++;
