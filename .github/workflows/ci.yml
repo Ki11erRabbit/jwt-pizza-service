@@ -111,6 +111,10 @@ jobs:
         with:
           name: package
           path: dist/
+      - name: Run Dastardly Action Step
+        uses: PortSwigger/dastardly-github-action@main
+        with:
+          target-url: 'https://pizza.ki11errabbit.xyz'
   deploy:
     runs-on: ubuntu-latest
     permissions:
