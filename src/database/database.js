@@ -120,7 +120,7 @@ class DB {
       }
       if (email) {
         query_params.push("email=?");
-        parameters.push(`${email}`)
+        parameters.push(`'${email}'`)
         //params.push(`email='${email}'`);
       }
       if (parameters.length > 0) {
